@@ -3,7 +3,7 @@ Basic program for turning ASCII characters into byte hex for ease of packet payl
 
 Purpose: These can be pre/appended into a variable with other binary hex, and get sent to a target address or domain via socket's sendto() method as a form of autmocation.
 
-Pentesting application: delivering payloads via HTTP (and other) packets. This is the beginning of bing able to use socket() in python to delvier payloads.
+Pentesting application: delivering payloads via HTTP (and other) packets. This is the beginning of bing able to use socket() in python to deliver payloads.
 
 """
 import re
