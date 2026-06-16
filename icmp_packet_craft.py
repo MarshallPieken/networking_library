@@ -1,6 +1,5 @@
 """
-=================================================================================================================
-Method: default_icmp_packet()
+================================================================================================================================
 Purpose: Learning about ICMP echo requests, and learning how to carft payloads into them.
 How: Manually crafting an ICMP echo request. Detection of this could come from the length of it as a network traffic anomaly.
 Here's each part of the packet: 
@@ -22,7 +21,23 @@ Sources:
 - https://inc0x0.com/tcp-ip-packets-introduction/tcp-ip-packets-3-manually-create-and-send-raw-tcp-ip-packets/#improve-packet
 - https://inc0x0.com/icmp-ip-packets-ping-manually-create-and-send-icmp-ip-packets/
 - https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml 
-=================================================================================================================
+================================================================================================================================
+
+Here's the ICMP header breakdown: (Shown as in https://inc0x0.com/icmp-ip-packets-ping-manually-create-and-send-icmp-ip-packets/)
+---------------------------------------------------------------------------------------------
+Decimal:     0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15 
+Hexadecimal: 0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F 
+Binary:      0000 0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1110 1111 
+---------------------------------------------------------------------------------------------
+ICMP Header
+Bit
+0    4    8    12   16   20   24   28   32
+0100 0101 0000 0000 0000 0000 0001 1101   | Version (4), IHL (5), Type of Service (00), Total Length (00 1C)
+1010 1011 1100 1101 0000 0000 0000 0000   | ID (AB CD), Flags (000), Fragment Offset (000000000000)
+0100 0000 0000 0001 0000 0000 0000 0000   | TTL (40), Protocol (01), Header Checksum (To be calculated)
+1101 0000 0110 1000 1001 0010 1000 0011   | Source IP: C0 A8 92 83 (192.168.164.131)
+0000 1000 0000 1000 0000 1000 0000 1000   | Destination IP: 8.8.8.8
+---------------------------------------------------------------------------------------------
 """
 
 
@@ -45,7 +60,6 @@ def default_http_packet():
         Host: example.com\r\n
         User-Agent: MyClient/1.0\r\n
         \r\n
-    I need to be able to represent that in raw hex form.
      """
     # initialize socket var w/ internet (IPv4 or domain) addressing, raw socket, TCP protocol.
     s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)

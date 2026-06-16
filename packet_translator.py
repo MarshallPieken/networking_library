@@ -3,7 +3,15 @@ Basic program for turning ASCII characters into byte hex for ease of packet payl
 
 Purpose: These can be pre/appended into a variable with other binary hex, and get sent to a target address or domain via socket's sendto() method as a form of autmocation.
 
+Methods:
+- ascii_to_hex_bytes
+- ipv4_to_byte_hex: takes an ipv4 string and outputs it in 
+
 Pentesting application: delivering payloads via HTTP (and other) packets. This is the beginning of bing able to use socket() in python to deliver payloads.
+
+TODO: 
+- Actually change the ascii_to_bytes input to binary 
+- Make another method which translates IPv6 into byte hex
 
 """
 import re
@@ -13,14 +21,30 @@ import binascii
 def ascii_to_hex_bytes(ascii_input: str):
 
     #convert to hex
-    raw_hex = binascii.hexlify(ascii_input.encode('ascii')).decode('ascii')
-    print(f"[*] Processing... Here's the raw hex:\n {raw_hex}\n")
+    raw_hex = binascii.a2b_hex(binascii.hexlify(ascii_input.encode()))
 
-    # add in \x per each hex byte
-    packet_hex = re.sub(r'([0-9A-Fa-f]{2})', r'\\x\1', raw_hex)
-
-    return packet_hex
+    return raw_hex
     
+#-------------------------------------------------------------------------------------------------#
+def ipv4_to_byte_hex(ipstr: str):
+
+    #use regex to translate ip address into hex
+    split_ip: list[str] = ipstr.split(".")
+
+    if len(split_ip) != 4:
+        print("Not a real IPv4 - check the input")
+        exit(code=5)
+    
+    out = b""
+    for n in split_ip:
+        if not n.isdigit():
+            print("It's gotta be a digit")
+            exit(code=5)
+        out += binascii.a2b_hex(hex(int(n)).replace("0x","").zfill(2))
+    return out
+
+
+
 #-------------------------------------------------------------------------------------------------#
 if __name__ == "__main__":
     
@@ -45,12 +69,13 @@ Accept-Encoding: gzip, deflate, br, zstd\r\n
 Accept-Language: en-US,en;q=0.9\r\n
 Connection:	keep-alive\r\n
 Host: www.marshall.edu\r\n
-Referer: https://www.marshall.edu/\r\n
+Referer: https://www.marshall.edu/\r\n\xff
 Sec-Fetch-Dest:	script\r\n
 Sec-Fetch-Mode:	no-cors\r\n
 Sec-Fetch-Site:	same-origin\r\n
 User-Agent:	Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0\r\n
-    \r\n
+\r\n
+
     """
     print(f"[*] Starting HTTP request headers: {ascii_input_2}")
     
@@ -58,4 +83,5 @@ User-Agent:	Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 F
     result = ascii_to_hex_bytes(ascii_input_2)
     print()
     print(f"[*] Finshed! Result: \n{result}\n\n")
-    
+
+print(ipv4_to_byte_hex("7.7.7.7")) 
