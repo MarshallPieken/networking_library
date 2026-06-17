@@ -3,22 +3,31 @@ Basic program for turning ASCII characters into byte hex for ease of packet payl
 
 Purpose: These can be pre/appended into a variable with other binary hex, and get sent to a target address or domain via socket's sendto() method as a form of autmocation.
 
+Author: Alex Pieken 
+
 Methods:
-- ascii_to_hex_bytes
+- ascii_to_hex_bytes: converts ascii to hexbytes.
 - ipv4_to_byte_hex: takes an ipv4 string and outputs it in 
 
 Pentesting application: delivering payloads via HTTP (and other) packets. This is the beginning of bing able to use socket() in python to deliver payloads.
 
 TODO: 
-- Actually change the ascii_to_bytes input to binary 
-- Make another method which translates IPv6 into byte hex
-
+- Make another method which translates IPv6 into byte hex?
 """
 import re
 import binascii
 
 #-------------------------------------------------------------------------------------------------#
 def ascii_to_hex_bytes(ascii_input: str):
+    """
+    encodes(decodes?) ASCII to hex bytes.
+
+    args:
+    - ascii_input: The header infromation to be converted
+
+    returns:
+    - raw_hex: hexbyte-converted ASCII. 
+    """
 
     #convert to hex
     raw_hex = binascii.a2b_hex(binascii.hexlify(ascii_input.encode()))
@@ -27,6 +36,15 @@ def ascii_to_hex_bytes(ascii_input: str):
     
 #-------------------------------------------------------------------------------------------------#
 def ipv4_to_byte_hex(ipstr: str):
+    """
+    Converts IPv4 to hex bytes for loading into the rest of the program. This will be a useful helper fcuntion in designing a program to custom-load & send packets.
+
+    args:
+    - ipstr: the user-identified IP which they wish to convert.
+
+    returns: 
+    - out: the hex-converted IPv4 address.
+    """
 
     #use regex to translate ip address into hex
     split_ip: list[str] = ipstr.split(".")
