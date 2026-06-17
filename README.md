@@ -2,27 +2,35 @@
 Low-level manual packet crafting &amp; basic translation programming in python via socket &amp; other libraries.
 
 # Programs
-**ascii_to_byte_hex.py**
-Translates ASCII characters to byte hex for python's socket library, via the binascii & re lirbaries.
+**ICMPpacket.py**
 
-**icmp_packet_craft.py**
-Purpose: Learning about ICMP echo requests, and learning how to carft payloads into them.
-How: Manually crafting an ICMP echo request. Detection of this could come from the length of it as a network traffic anomaly.
-Here's each part of the packet: 
-- Version, IHL, Type of Service, Total Length
-- Identification, Flags, Fragment Offset 
-- TTL, Protocol, header checksum
-- Source Address
-- Destination Address
-- Payload (This is where the packet gains an unusual length)
+This started as just an ICMP packet crafting script and turned into something larger with IP & ICMP headers, as well as payload encoding for transmission & checksum calculation. Here's the to-do from it: 
+TODO:
+- Add in a CLI execution layer for user input and preferences (probably using argparse)
+- Add in an Ethernet II header option
+- Eventually make a layer 4 TCP/IP header subclass to append to the IP packet header 
+    - (including self, sourcePort, destPort, tcpipSeqNum, ackNum, flags, windowSize, checksum, urgentPointer)
+- Test/debug/fix this program
+- Eventually add in other packet construction methods to understand 'em: 
+    Layer 2 (Needs socket's AF_PACKET in a separate L2 packet carfting method)
+    |- ethernet II (IEEE 802.1Q LAN): https://www.geeksforgeeks.org/computer-networks/ethernet-frame-format/, https://ieeexplore.ieee.org/browse/standards/get-program/page/series?id=68 
+    |- VLAN (IEEE 802.1Q): https://en.wikipedia.org/wiki/IEEE_802.1Q, https://learningnetwork.cisco.com/s/question/0D56e0000EBtaQ9CQJ/ieee-8021q-vlan-tagging-and-trunking-in-networking, 
+    layer 3
+    |- arp: https://en.wikipedia.org/wiki/Address_Resolution_Protocol, https://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml 
+    Layer 4
+    |- UDP (RFC 768): https://www.rfc-editor.org/info/rfc768/  
+    |- TCP (RFC 9293): https://www.ietf.org/rfc/rfc9293.html#name-header-format
+    |- SCTP (9260): https://www.ietf.org/rfc/rfc9260.pdf
 
-ICMP header requires:
-- type of msg, code, checksum
-- identifier, sequence number
+**packet_translator.py**
 
-These are all crafted in hex representation of ASCII chars.
+This is just a basic program for turning ASCII characters into byte hex representations to help me break the ice into this field.
 
-**  **
+Purpose: Learning how to use python to en/decode between strings, ints, and byte hex, with IPv4 parsing.
+
+Methods:
+- ascii_to_hex_bytes: converts ascii to hexbytes.
+- ipv4_to_byte_hex: takes an ipv4 string and outputs it in hex without periods
 
 ---
 # Sources
