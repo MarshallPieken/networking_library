@@ -33,7 +33,7 @@ Methods:
 - ipv4_to_byte_hex: takes an ipv4 string and outputs it in hex without periods
 
 ---
-# Sources
+# More Learning Sources
 - https://docs.python.org/3/library/socket.html 
 - https://inc0x0.com/tcp-ip-packets-introduction/tcp-ip-packets-3-manually-create-and-send-raw-tcp-ip-packets/#improve-packet
 - https://inc0x0.com/icmp-ip-packets-ping-manually-create-and-send-icmp-ip-packets/
