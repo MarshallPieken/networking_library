@@ -1,18 +1,15 @@
 """
 Basic program for turning ASCII characters into byte hex for ease of packet payload dumping.
 
-Purpose: These can be pre/appended into a variable with other binary hex, and get sent to a target address or domain via socket's sendto() method as a form of autmocation.
-
-Author: Alex Pieken 
+Purpose: These can be pre/appended into a variable with other binary hex, and get sent to a target address or domain via socket's sendto() method as a form of autmocation. 
 
 Methods:
 - ascii_to_hex_bytes: converts ascii to hexbytes.
 - ipv4_to_byte_hex: takes an ipv4 string and outputs it in 
 
-Pentesting application: delivering payloads via HTTP (and other) packets. This is the beginning of bing able to use socket() in python to deliver payloads.
-
 TODO: 
 - Make another method which translates IPv6 into byte hex?
+
 """
 import re
 import binascii
