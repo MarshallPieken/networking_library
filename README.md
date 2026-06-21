@@ -1,5 +1,5 @@
 # networking_library
-Low-level manual packet crafting &amp; basic translation programming in python via socket &amp; other libraries.
+Low-level manual packet crafting &amp; basic translation programming in python via socket &amp; other libraries. Still a work in progress.
 
 # Programs
 **ICMPpacket.py**
@@ -11,15 +11,24 @@ TODO:
 - Eventually make a layer 4 TCP/IP header subclass to append to the IP packet header 
     - (including self, sourcePort, destPort, tcpipSeqNum, ackNum, flags, windowSize, checksum, urgentPointer)
 - Test/debug/fix this program
-- Eventually add in other packet construction methods to understand 'em: 
+- Eventually add in other packet construction methods to understand 'em:
+
     Layer 2 (Needs socket's AF_PACKET in a separate L2 packet carfting method)
-    |- ethernet II (IEEE 802.1Q LAN): https://www.geeksforgeeks.org/computer-networks/ethernet-frame-format/, https://ieeexplore.ieee.org/browse/standards/get-program/page/series?id=68 
-    |- VLAN (IEEE 802.1Q): https://en.wikipedia.org/wiki/IEEE_802.1Q, https://learningnetwork.cisco.com/s/question/0D56e0000EBtaQ9CQJ/ieee-8021q-vlan-tagging-and-trunking-in-networking, 
+  
+    |- ethernet II (IEEE 802.1Q LAN): https://www.geeksforgeeks.org/computer-networks/ethernet-frame-format/, https://ieeexplore.ieee.org/browse/standards/get-program/page/series?id=68
+  
+    |- VLAN (IEEE 802.1Q): https://en.wikipedia.org/wiki/IEEE_802.1Q, https://learningnetwork.cisco.com/s/question/0D56e0000EBtaQ9CQJ/ieee-8021q-vlan-tagging-and-trunking-in-networking,
+  
     layer 3
-    |- arp: https://en.wikipedia.org/wiki/Address_Resolution_Protocol, https://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml 
+  
+    |- arp: https://en.wikipedia.org/wiki/Address_Resolution_Protocol, https://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml
+  
     Layer 4
-    |- UDP (RFC 768): https://www.rfc-editor.org/info/rfc768/  
+  
+    |- UDP (RFC 768): https://www.rfc-editor.org/info/rfc768/
+  
     |- TCP (RFC 9293): https://www.ietf.org/rfc/rfc9293.html#name-header-format
+  
     |- SCTP (9260): https://www.ietf.org/rfc/rfc9260.pdf
 
 **packet_translator.py**
