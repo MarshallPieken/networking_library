@@ -9,8 +9,6 @@ Methods:
 
 
 """
-
-import PacketCraft
 import socket
 import binascii
 
@@ -89,3 +87,15 @@ def send_layer3_packet(packet, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
     s.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
     s.sendto(packet.destAddr, port)
+
+def starting_sequence():
+    print("""
+    ██████   █████   ██████ ██   ██ ███████ ████████  ██████ ██████   █████  ███████ ████████ 
+    ██   ██ ██   ██ ██      ██  ██  ██         ██    ██      ██   ██ ██   ██ ██         ██    
+    ██████  ███████ ██      █████   █████      ██    ██      ██████  ███████ █████      ██    
+    ██      ██   ██ ██      ██  ██  ██         ██    ██      ██   ██ ██   ██ ██         ██    
+    ██      ██   ██  ██████ ██   ██ ███████    ██     ██████ ██   ██ ██   ██ ██         ██    
+    version 0.1
+
+    use -h or --help to see the help menu.
+    """)

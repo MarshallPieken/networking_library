@@ -2,6 +2,8 @@
 Purpose: Learning about ICMP packets, and learning how to carft payloads into them.
 How: Manually crafting IP, ICMP and other packets. Detection of this could come from the length of it as a network traffic anomaly.
 
+TO DISABLE COPILOT INLINE SUGGESTIONS: go to preferences > settings & search  editor.inlinesuggest: find "Editor Inline Suggest: **Enabled**" and uncheck that annoying shit 
+
 NOTE: Any Layer 2 or lower packet crafting does not work for Windows, thanks to its netowrking stack restrictions. 
 I'll eventually build out a Scapy or C module to bypass those restrictions as well. In the meantime, Linux will process anything here.
 
@@ -14,6 +16,7 @@ Sources:
 - https://www.geeksforgeeks.org/python/extend-class-method-in-python/
 - https://www.scribd.com/doc/13628928/802-11-Protocol-Stack-and-Physical-Layer
 - TCP: https://www.rfc-editor.org/info/rfc9293/ 
+- Python bitwise operators: https://www.geeksforgeeks.org/python/python-bitwise-operators/ 
 ================================================================================================================================
 Basic conversion from decimal -> hex -> binary                                                | 
 ----------------------------------------------------------------------------------------------|
@@ -28,18 +31,12 @@ binary:    1100 1000                                                            
 ----------------------------------------------------------------------------------------------------|
 
 TODO:
-- Eventually make a layer 4 TCP/IP header to append to the IP packet header 
-    - (including self, sourcePort, destPort, tcpipSeqNum, ackNum, flags, windowSize, checksum, urgentPointer)
-    - Also a checksum calculationmethod for this one
 - Test/debug/fix this program
 - Eventually add in other packet construction methods: 
     Layer 2 (Needs socket's AF_PACKET in a separate L2 packet carfting method)
     |- ethernet II (IEEE 802.1Q LAN): https://www.geeksforgeeks.org/computer-networks/ethernet-frame-format/, https://ieeexplore.ieee.org/browse/standards/get-program/page/series?id=68 
     |- VLAN (IEEE 802.1Q): https://en.wikipedia.org/wiki/IEEE_802.1Q, https://learningnetwork.cisco.com/s/question/0D56e0000EBtaQ9CQJ/ieee-8021q-vlan-tagging-and-trunking-in-networking, 
-    layer 3
-    |- ARP: https://en.wikipedia.org/wiki/Address_Resolution_Protocol, https://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml 
     Layer 4 
-    |- TCP (RFC 9293): https://www.ietf.org/rfc/rfc9293.html#name-header-format
     |- SCTP (9260): https://www.ietf.org/rfc/rfc9260.pdf
 
 After all this is made in the next little while, we can move on to bluetooth, phone, etc.
@@ -248,19 +245,23 @@ bit
 
 Sources: 
 - https://www.ietf.org/rfc/rfc9293.html 
-"""
-class TCPheader(AbstractPacket): # TODO: after ARP
+- https://www.geeksforgeeks.org/computer-networks/calculation-of-tcp-checksum/
 
-    def __init__(self, sourcePort, destPort, tcpSeqNum, ackNum, dataOffset, 
+Eventually we can add option flags if the user wants.
+Make CoPilot shut the fuck up
+"""
+class TCPheader(AbstractPacket): 
+
+    def __init__(self, sourcePort, destPort, tcpSeqNum, ackNum,
                                 nullPad, ns, cwr, ece, urg, ack, psh, rst, syn, fin, 
-                                winSize, tcpChecksum, urgentPointer, tcpPayload):
+                                winSize, urgentPointer, tcpPayload):
         
         # TCP class Constructor
         self.sourcePort = sourcePort
         self.destPort = destPort
         self.tcpSeqNum = tcpSeqNum
         self.ackNum = ackNum
-        self.dataOffset = dataOffset
+        # dataOffset will be calculated below
         self.nullPad = nullPad
         self.ns = ns
         self.cwr = cwr
@@ -272,13 +273,109 @@ class TCPheader(AbstractPacket): # TODO: after ARP
         self.syn = syn
         self.fin = fin
         self.winSize = winSize
-        self.tcpChecksum = tcpChecksum
+        # tcpChecksum will be calculated below
         self.urgentPointer = urgentPointer
         self.tcpPayload = tcpPayload
 
-    def calc_tcp_checksum(self):
-        pass
+    def calc_tcp_length(self, payload):
+        """
+        Calculates the length of the TCP header and payload.
 
+        args:
+        IPheader: the IP header of the packet
+        tcpHeader: the TCP header of the packet
+        payload: the user's payload
+
+        returns:
+        tcpLength: the total length of the TCP header and payload
+        """
+        
+        tcpLength = len(payload) + 20  # 20 is the size of the TCP header
+        
+        return tcpLength
+
+    def calc_tcp_checksum(self, IPheader, padding, protocol, tcpLength, payload, sourcePort, destPort, 
+                            tcpSeqNum, ackNum, dataOffset, nullPad, cwr, ece, urg, ack, psh, rst, syn, fin, 
+                            winSize, urgentPointer,):
+        """
+        This calculates the checksum for the TCP header to be passed in at runtime. 
+        The TCP header checksum is constituted out of the TCP header, TCP body, and Pseudo IP header (certain parts of it)
+        
+        args
+            Pseudo IP header:
+            - source IP address
+            - destination IP
+            - TCP/UDP segment length
+            - Protocol 
+            - 8 bits for padding
+
+            TCP header:
+            - padding
+            - protocol
+            - tcpLength
+            - payload
+            - sourcePort
+            - destPort
+            - tcpSeqNum
+            - ackNum
+            - dataOffset
+            - nullPad
+            - cwr
+            - ece
+            - urg
+            - ack
+            - psh
+            - rst
+            - syn
+            - fin
+            - winSize
+            - urgentPointer
+
+        returns
+            - tcpChecksum: TCP header checksum
+        """        
+
+        # if payload is not en even amt of bytes, append one byte to it to make it even.
+        if len(payload) % 2 != 0:
+            payload += b'\x00'
+
+        # Struct documentation: https://docs.python.org/3/library/struct.html
+        # construct the pseudo IP header for calculating the TCP header checksum
+        pseudoIpHeader = struct.pack(
+            '!4s4sBBH', 
+            IPheader.sourceAddr, IPheader.destAddr, padding, protocol, tcpLength
+        )
+
+        #calculate the offset, padding, & flags into one 2-byte field with a nasty bit shift one-liner
+        tcpFlags = (((((((((dataOffset << 4 | nullPad) << 1 | cwr) << 1 |  ece) << 1 | urg ) << 1 | ack) << 1 | psh) << 1 | rst) << 1 | syn) << 1 | fin)
+        
+        #insert blank Chcksum (00 00)
+        tmpChecksum = 0
+
+        # Add the rest of the TCP header to the pseudo IP header for checksum
+        tcpChecksum  = pseudoIpHeader + struct.pack(
+            '!HHIIHHHH', 
+            sourcePort, destPort, tcpSeqNum, ackNum, tcpFlags,
+            winSize, tmpChecksum, urgentPointer
+        )
+
+        tcpChecksum += payload
+
+        # Let's do the one's complement, carry over, and negation. Copped from the UDP checksum calculation. 
+        tcpChecksum = 0
+        carryOver = 0x0
+
+        #for-loop to turn the psedoheder into 2-byte words
+        for i in range(0, len(pseudoIpHeader), 2): 
+            tcpChecksum += pseudoIpHeader[i] << 8 | pseudoIpHeader[i+1]
+        
+        # fold the carries
+        while tcpChecksum > 0xFFFF:
+            carryOver = tcpChecksum >> 16 # get the carrover (everything left of 16 bits)
+            tcpChecksum = tcpChecksum & 0xFFFF # exclude the subtotal from its carryover 
+            tcpChecksum += carryOver # add on the carryover to the subtotal
+
+        return tcpChecksum
 
 """
 Class UDPheader : Constructs a user-defined UDP packet header.
@@ -385,8 +482,8 @@ class UDPheader():
 """
 Class ARPheader: Constructs a user-defined ARP packet header.
 =================================================================================================================================
-Here's the ICMP header breakdown: (Shown as in https://inc0x0.com/icmp-ip-packets-ping-manually-create-and-send-icmp-ip-packets/)
-ICMP Packet Header Params
+Here's the ARP header breakdown: (Shown as in https://inc0x0.com/icmp-ip-packets-ping-manually-create-and-send-icmp-ip-packets/)
+ARP Packet Header Params
 bit
 1  4    8    12   16   20   24   28   32 
 0000 1000 0000 0000 0000 0000 0000 0000 | Hardware Type (08 00), Protocol Type (00 00, 16 bits)
@@ -400,6 +497,15 @@ bit
 
 Sources: 
 - https://www.rfc-editor.org/info/rfc792/ 
+- https://datatracker.ietf.org/doc/html/rfc6747 
+- https://en.wikipedia.org/wiki/Address_Resolution_Protocol 
+- https://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml 
+- For the protocol type: https://www.rfc-editor.org/info/rfc7042/
+
+The main challenge with the ARP header is its purpsoe of standardizing address resolution for various hardware addresses, 
+which also means 
+
+TODO making a basic lookup table for hardware types to their address lengths at the CLI layer with (--list-hardware-types or something)
 """
 class ARPheader():
     def __init__(self, hardwareType, protoType, hwAddrLen, protoAddrLen, 
@@ -411,12 +517,7 @@ class ARPheader():
         self.hwAddrLen = hwAddrLen
         self.protoAddrLen = protoAddrLen
         self.opcode = opcode
-        self.senderHeAddr = senderHwAddr
+        self.senderHwAddr = senderHwAddr
         self.senderProtoAddr = senderProtoAddr
-        self.targetHeAddr = targetHwAddr
-        self.targetProtoAddr = targetProtoAddr
-
-    #TODO: Make a series of methods for CLI scripting implementation with -flags & args for options.
-    # - layer this over the packet construction class params, allowing for easier implementation.
-    # - if there are header fields the user doesn't specify, use defaults. 
-    # - Definitely use (probably nested) switch statements with if/else statements for input checks    
+        self.targetHwAddr = targetHwAddr
+        self.targetProtoAddr = targetProtoAddr  
