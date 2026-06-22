@@ -49,7 +49,6 @@ from AbstractPacket import AbstractPacket
 
 """
 Class IPheader: Constructs a user-defined IP packet header. 
-
 -------------------------------------------------------------------------------------------------------------------
 IP Header Construction
 Bit

@@ -68,7 +68,7 @@ def ipv4_to_byte_hex(ipstr: str):
         out += binascii.a2b_hex(hex(int(n)).replace("0x","").zfill(2))
     return out
 
-#--------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
 def send_layer3_packet(packet, port):
     """
     Actually crafts and sends the packet based on out preferences. 
@@ -88,7 +88,10 @@ def send_layer3_packet(packet, port):
     s.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
     s.sendto(packet.destAddr, port)
 
+#-------------------------------------------------------------------------------------------------#
 def starting_sequence():
+    """ What pops up when the program is called from the CLI """
+
     print("""
     ██████   █████   ██████ ██   ██ ███████ ████████  ██████ ██████   █████  ███████ ████████ 
     ██   ██ ██   ██ ██      ██  ██  ██         ██    ██      ██   ██ ██   ██ ██         ██    
@@ -97,5 +100,4 @@ def starting_sequence():
     ██      ██   ██  ██████ ██   ██ ███████    ██     ██████ ██   ██ ██   ██ ██         ██    
     version 0.1
 
-    use -h or --help to see the help menu.
     """)
