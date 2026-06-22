@@ -2,15 +2,11 @@
 Low-level manual packet crafting &amp; basic translation programming in python via socket &amp; other libraries. Still a work in progress.
 
 # Programs
-**ICMPpacket.py**
+**PacketCraft.py**
 
 This started as just an ICMP packet crafting script and turned into something larger with IP & ICMP headers, as well as payload encoding for transmission & checksum calculation. Here's the to-do from it: 
 TODO:
-- Add in a CLI execution layer for user input and preferences (probably using argparse)
 - Add in an Ethernet II header option
-- Eventually make a layer 4 TCP/IP header subclass to append to the IP packet header 
-    - (including self, sourcePort, destPort, tcpipSeqNum, ackNum, flags, windowSize, checksum, urgentPointer)
-- Test/debug/fix this program
 - Eventually add in other packet construction methods to understand 'em:
 
     Layer 2 (Needs socket's AF_PACKET in a separate L2 packet carfting method)
@@ -19,15 +15,7 @@ TODO:
   
     |- VLAN (IEEE 802.1Q): https://en.wikipedia.org/wiki/IEEE_802.1Q, https://learningnetwork.cisco.com/s/question/0D56e0000EBtaQ9CQJ/ieee-8021q-vlan-tagging-and-trunking-in-networking,
   
-    layer 3
-  
-    |- arp: https://en.wikipedia.org/wiki/Address_Resolution_Protocol, https://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml
-  
     Layer 4
-  
-    |- UDP (RFC 768): https://www.rfc-editor.org/info/rfc768/
-  
-    |- TCP (RFC 9293): https://www.ietf.org/rfc/rfc9293.html#name-header-format
   
     |- SCTP (9260): https://www.ietf.org/rfc/rfc9260.pdf
 
