@@ -6,6 +6,8 @@ Author: Alex Pieken
 import PacketCraft
 from utils import starting_sequence
 import argparse
+from packet_builder import build_packet
+import socket 
 
 """
 TODO: Make a series of methods for CLI scripting implementation with -flags & args for options.
@@ -87,3 +89,19 @@ if __name__ == "__main__":
     starting_sequence()
     parse_args()
     args = parser.parse_args()
+
+    packet = build_packet(args)
+    raw = packet.build()
+
+    if args.tcp:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
+    elif args.udp:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
+    else:
+        # ICMP, ARP, raw IP all use IPPROTO_RAW
+        sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
+
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1) # tell the kernel you're building the IP header yourself
+    sock.sendto(raw, (args.dest, 0))
+    print(f"[+] Packet sent to {args.dest} ({len(raw)} bytes)")
+    sock.close()
