@@ -48,10 +48,6 @@ def parse_args():
     parser.add_argument('--rst', help='set the TCP RST (Reset) flag')
     parser.add_argument('--syn', help='set the TCP SYN (Synchronization) flag')
     parser.add_argument('--fin', help='set the TCP FIN (No more data from sender) flag')
-    
-    # Make these options in constructing the IP header:
-    # tcp_group.add_argument('--source-adress', help='IPv4 Source Address')
-    # tcp_ group.add_argument('--dest-address', help='IPv4 Destination Address')
 
     # Construct an ICMP packet per user specificaton.
     parser.add_argument('--icmp-message-type', help='Specify ICMP message type (e.g., 3 for destination unreachable). ICMP message types are available here: https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml')
@@ -69,7 +65,7 @@ def parse_args():
     parser.add_argument('--arp-target-ip', help='Specify the target\'s IPv4 address.')
 
 
-    # Construct an IP packet header per user specificaton. 
+    # IP packet header user specificatons 
     parser.add_argument('--ip-ihl', help='IHL is Internet Haeder Length.')
     parser.add_argument('--ip-service-type', help='Service Type is defined more in-detail at https://www.rfc-editor.org/info/rfc791')
     parser.add_argument('--ip-id', help='The ID the receiver uses to construct a datagram from multiple packets.')
@@ -80,7 +76,8 @@ def parse_args():
     parser.add_argument('--ip-source-address', help='')
     parser.add_argument('--ip-dest-address', help='')
 
-    # Construct a UDP packet per user specificaton.
+    # UDP packet per user specificatons
+    parser.add_argument('--udp-sourcePort' help='')
 
 if __name__ == "__main__":
     starting_sequence()
