@@ -31,7 +31,6 @@ binary:    1100 1000                                                            
 ----------------------------------------------------------------------------------------------------|
 
 TODO:
-- Test/debug/fix this program
 - Eventually add in other packet construction methods: 
     Layer 2 (Needs socket's AF_PACKET in a separate L2 packet carfting method)
     |- ethernet II (IEEE 802.1Q LAN): https://www.geeksforgeeks.org/computer-networks/ethernet-frame-format/, https://ieeexplore.ieee.org/browse/standards/get-program/page/series?id=68 
@@ -66,30 +65,30 @@ Sources:
 class IPheader(AbstractPacket):
     def  __init__(self,
                     version: int, 
-                    ihl: int, 
-                    serviceType: int, 
-                    id: int, 
-                    flags: int, 
+                    ip_ihl: int, 
+                    ip_service_type: int, 
+                    ip_id: int, 
+                    ip_flags: int, 
                     fragmentOffset: int, 
-                    ttl: int, 
-                    protocol: int, 
+                    ip_ttl: int, 
+                    ip_protocol: int, 
                     checksum: int, 
-                    sourceAddr: str, 
-                    destAddr: str,
+                    ip_source_address: str, 
+                    ip_target_address: str,
                     payload = None):
 
         # Constructor
         self.version = version
-        self.ihl = ihl
-        self.serviceType = serviceType  
-        self.id = id
-        self.flags = flags
+        self.ihl = ip_ihl
+        self.serviceType = ip_service_type
+        self.id = ip_id
+        self.flags = ip_flags
         self.fragmentOffset = fragmentOffset
-        self.ttl = ttl
-        self.protocol = protocol
+        self.ttl = ip_ttl
+        self.protocol = ip_protocol
         self.checksum = checksum
-        self.sourceAddr = sourceAddr
-        self.destAddr = destAddr
+        self.sourceAddr = ip_source_address
+        self.destAddr = ip_target_address
         self.payload = payload
 
     @override
@@ -173,22 +172,22 @@ Sources:
 - https://www.rfc-editor.org/info/rfc792/ 
 """
 class ICMPheader(AbstractPacket):
-    def __init__(self, icmpMessageType, icmpCode, icmpChecksum, icmpIdentifier, icmpSeqNum, icmpPayload):
+    def __init__(self, icmp_message_type, icmp_code, icmp_checksum, icmp_identifier, icmp_seq_num, icmp_payload):
         
         # ICMP class Constructor
-        self.icmpMessageType = icmpMessageType
-        self.icmpCode = icmpCode
-        self.icmpChecksum = icmpChecksum
-        self.icmpIdentifier = icmpIdentifier
-        self.icmpSeqNum = icmpSeqNum
-        self.icmpPayload = icmpPayload
+        self.icmpMessageType = icmp_message_type
+        self.icmpCode = icmp_code
+        self.icmpChecksum = icmp_checksum
+        self.icmpIdentifier = icmp_identifier
+        self.icmpSeqNum = icmp_seq_num
+        self.icmpPayload = icmp_payload
 
         # Assemble the ICMP packet 
-        self.icmp_header = utils.int_to_byte(self.icmpMessageType, 1)
-        self.icmp_header = utils.int_to_byte(self.icmpCode, 1)
-        self.icmp_header = utils.int_to_byte(self.icmpChecksum, 2)
-        self.icmp_header = utils.int_to_byte(self.icmpIdentifier, 2)
-        self.icmp_header = utils.int_to_byte(self.icmpSeqNum, 2)
+        self.icmp_header  = utils.int_to_byte(self.icmpMessageType, 1)
+        self.icmp_header += utils.int_to_byte(self.icmpCode, 1)
+        self.icmp_header += utils.int_to_byte(self.icmpChecksum, 2)
+        self.icmp_header += utils.int_to_byte(self.icmpIdentifier, 2)
+        self.icmp_header += utils.int_to_byte(self.icmpSeqNum, 2)
 
         payload = "example"
         self.icmp_header = utils.int_to_byte(self.icmpPayload, 0) # make a function to feed a payload into and calculate its length in hex for this. then make this a variable which does that.
@@ -251,13 +250,13 @@ Make CoPilot shut the fuck up
 """
 class TCPheader(AbstractPacket): 
 
-    def __init__(self, sourcePort, destPort, tcpSeqNum, ackNum,
+    def __init__(self, tcp_src_port, tcp_dest_port, tcpSeqNum, ackNum,
                                 nullPad, ns, cwr, ece, urg, ack, psh, rst, syn, fin, 
                                 winSize, urgentPointer, tcpPayload):
         
         # TCP class Constructor
-        self.sourcePort = sourcePort
-        self.destPort = destPort
+        self.sourcePort = tcp_src_port
+        self.destPort = tcp_dest_port
         self.tcpSeqNum = tcpSeqNum
         self.ackNum = ackNum
         # dataOffset will be calculated below
@@ -391,11 +390,11 @@ bit
 =================================================================================================
 """
 class UDPheader():
-    def __init__(self, sourcePort, destPort, payload) -> None:
+    def __init__(self, udp_source_port, udp_dest_port, payload) -> None:
         
         # UDP Header Constructor
-        self.sourcePort = sourcePort
-        self.destPort = destPort
+        self.sourcePort = udp_source_port
+        self.destPort = udp_dest_port
         self.udpLength = self.calc_udp_packet_length(payload) # calcumalate it here
         self.checksum = 0       # placeholder
         self.payload = payload
@@ -503,20 +502,18 @@ Sources:
 
 The main challenge with the ARP header is its purpsoe of standardizing address resolution for various hardware addresses, 
 which also means 
-
-TODO making a basic lookup table for hardware types to their address lengths at the CLI layer with (--list-hardware-types or something)
 """
 class ARPheader():
-    def __init__(self, hardwareType, protoType, hwAddrLen, protoAddrLen, 
-                    opcode, senderHwAddr, senderProtoAddr, targetHwAddr, targetProtoAddr):
+    def __init__(self, arp_hardware_type, arp_protocol_type, hwAddrLen, protoAddrLen, 
+                    arp_opcode, arp_sender_mac, arp_sender_ip, arp_target_mac, arp_target_ip):
 
         # ARPheader Constructor
-        self.hardwareType = hardwareType
-        self.protoType = protoType
+        self.hardwareType = arp_hardware_type
+        self.protoType = arp_protocol_type
         self.hwAddrLen = hwAddrLen
         self.protoAddrLen = protoAddrLen
-        self.opcode = opcode
-        self.senderHwAddr = senderHwAddr
-        self.senderProtoAddr = senderProtoAddr
-        self.targetHwAddr = targetHwAddr
-        self.targetProtoAddr = targetProtoAddr  
+        self.opcode = arp_opcode
+        self.senderHwAddr = arp_sender_mac
+        self.senderProtoAddr = arp_sender_ip
+        self.targetHwAddr = arp_target_mac
+        self.targetProtoAddr = arp_target_ip  

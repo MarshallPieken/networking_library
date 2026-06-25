@@ -26,8 +26,10 @@ Source: https://stackoverflow.com/questions/21962763/using-a-dictionary-as-a-swi
 # create the argparse object for the CLI program to run with
 parser = argparse.ArgumentParser(prog='PacketCraft')
 
-# TODO: nest packet header args in _if_ statements, with _else_ being defaults pulled from the machine which the program is running on
+# TODO: 
+# - nest packet header args in _if_ statements, with _else_ being defaults pulled from the machine which the program is running on
 def parse_args():
+
 
     # make a mutually exclusive group to prevent protocol conflicts
     protocol_group = parser.add_mutually_exclusive_group()
@@ -36,6 +38,7 @@ def parse_args():
     protocol_group.add_argument('--arp', help='ARP packet construction. See RFC 826 for help understanding header options: https://www.rfc-editor.org/info/rfc826/')
     protocol_group.add_argument('--ip', help='IP packet construction See RFC 791 for help understanding header options: https://www.rfc-editor.org/info/rfc791/')
     protocol_group.add_argument('--udp', help='UDP packet construction. See RFC 768 for help understanding header options: https://www.rfc-editor.org/info/rfc768/')
+
 
     #Construct a TCP packet per user specificaton.
     parser.add_argument('--tcp-src-port', help='The source port for your TCP packet')
@@ -48,6 +51,7 @@ def parse_args():
     parser.add_argument('--rst', help='set the TCP RST (Reset) flag')
     parser.add_argument('--syn', help='set the TCP SYN (Synchronization) flag')
     parser.add_argument('--fin', help='set the TCP FIN (No more data from sender) flag')
+
 
     # Construct an ICMP packet per user specificaton.
     parser.add_argument('--icmp-message-type', help='Specify ICMP message type (e.g., 3 for destination unreachable). ICMP message types are available here: https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml')
@@ -72,27 +76,14 @@ def parse_args():
     parser.add_argument('--ip-flags', help='Flags to define transmission structure: see https://www.rfc-editor.org/info/rfc791')
     parser.add_argument('--ip-ttl', help='Time to Live is the time a packet may remain on the internet.')
     parser.add_argument('--ip-protocol', help='')
-    parser.add_argument('--ip-checksum', help='')
     parser.add_argument('--ip-source-address', help='')
-    parser.add_argument('--ip-dest-address', help='')
+    parser.add_argument('--ip-target-address', help='')
 
     # UDP packet per user specificatons
-    parser.add_argument('--udp-sourcePort' help='')
+    parser.add_argument('--udp-source-port', help='Specify the UDP packet\'s source port')
+    parser.add_argument('--udp-dest-port', help='Specify the UDP packet\'s detination port')
 
 if __name__ == "__main__":
     starting_sequence()
     parse_args()
     args = parser.parse_args()
-
-
-    # Connect the argparse options to their PacketCraft methods
-    # if args.tcp:
-    #     pass
-    # elif args.icmp:
-    #     pass
-    # elif args.arp:
-    #     pass
-    # elif args.ip:
-    #     pass
-    # elif args.udp:
-    #     pass

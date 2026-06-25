@@ -1,12 +1,8 @@
 # networking_library
 Low-level manual packet crafting &amp; basic translation programming in python via socket &amp; other libraries. Still a work in progress.
 
-# Programs
-**PacketCraft.py**
-
 This started as just an ICMP packet crafting script and turned into something larger with IP & ICMP headers, as well as payload encoding for transmission & checksum calculation. Here's the to-do from it: 
 TODO:
-- Add in an Ethernet II header option
 - Eventually add in other packet construction methods to understand 'em:
 
     Layer 2 (Needs socket's AF_PACKET in a separate L2 packet carfting method)
@@ -18,16 +14,6 @@ TODO:
     Layer 4
   
     |- SCTP (9260): https://www.ietf.org/rfc/rfc9260.pdf
-
-**packet_translator.py**
-
-This is just a basic program for turning ASCII characters into byte hex representations to help me break the ice into this field.
-
-Purpose: Learning how to use python to en/decode between strings, ints, and byte hex, with IPv4 parsing.
-
-Methods:
-- ascii_to_hex_bytes: converts ascii to hexbytes.
-- ipv4_to_byte_hex: takes an ipv4 string and outputs it in hex without periods
 
 ---
 # More Learning Sources
